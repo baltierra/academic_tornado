@@ -2,8 +2,7 @@
 
 README.txt: this file
 
-crawler.py: Skeleton for the catalog crawler/indexer. You will modify
-  this file
+crawler.py: Skeleton for the catalog crawler/indexer.
 
 course_map.json: JSON file that contains a dictionary that maps course
   codes (for example, "CMSC 12200") to unique identifiers.
