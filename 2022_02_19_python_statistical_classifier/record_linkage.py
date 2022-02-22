@@ -2,7 +2,7 @@
 Linking restaurant records in Zagat and Fodor's list using restraurant
 names, cities, and street addresses.
 
-Maria Gabriela Ayala
+FABIÁN ALEJANDRO ARANEDA-BALTIERRA
 '''
 import csv
 import itertools
@@ -31,7 +31,7 @@ def find_matches(output_filename, mu, lambda_, block_on_city=False):
   fodors = (pd.read_csv(FODORS_FILE)).rename(columns={'street address':\
     'address', 'restaurant name': 'name'})
   categorize = classifier(UNMATCHED_FILE, KNOWN_LINKS_FILE, mu, lambda_)
-  
+
   with open(output_filename, "w") as csvfile:
     record_linkage = csv.writer(csvfile, delimiter = ",")
     if not block_on_city:
@@ -39,7 +39,7 @@ def find_matches(output_filename, mu, lambda_, block_on_city=False):
         for f_idx, f_row in fodors.iterrows():
           sim_tuple = get_prob_blocks(z_row, f_row)
           label = categorize[sim_tuple]
-          record_linkage.writerow([z_idx, f_idx,label])         
+          record_linkage.writerow([z_idx, f_idx,label])
     else:
       for z_idx, z_row  in zagat.iterrows():
         for f_idx, f_row in fodors.iterrows():
@@ -52,7 +52,7 @@ def find_matches(output_filename, mu, lambda_, block_on_city=False):
 def get_prob_blocks(z_row, f_row):
   '''
   Computes Jaro-Winkler score for three fields (restaurant name,
-  city and address) between two data entries. Converts similarity 
+  city and address) between two data entries. Converts similarity
   score to probability blocks "low" or "medium" or "high".
   Inputs:
     (pd Series): row in Zagat DataFrame
@@ -61,10 +61,10 @@ def get_prob_blocks(z_row, f_row):
     (tuple): contains probability categorization for each of the three
     fields (cat_restaurant, cat_city, cat_loc)
   '''
-  
+
   jw_rest = jellyfish.jaro_winkler_similarity(z_row["name"], f_row["name"])
   jw_city = jellyfish.jaro_winkler_similarity(z_row["city"], f_row["city"])
-  jw_loc = jellyfish.jaro_winkler_similarity(z_row["address"], f_row["address"])             
+  jw_loc = jellyfish.jaro_winkler_similarity(z_row["address"], f_row["address"])
   cat_rest = util.get_jw_category(jw_rest)
   cat_city = util.get_jw_category(jw_city)
   cat_loc = util.get_jw_category(jw_loc)
@@ -93,7 +93,7 @@ def get_sim_tuples(filename):
         f_row = fodors.iloc[row.findex]
         sim_tups = get_prob_blocks(z_row, f_row)
         rv.append(sim_tups)
-    
+
     return rv
 
 
@@ -107,10 +107,10 @@ def combination(lst):
   '''
   rv = []
   n = len(lst)
-  
+
   for comb in itertools.product(lst, repeat = n):
     rv.append(comb)
-  
+
   return rv
 
 
@@ -144,7 +144,7 @@ def get_match_unmatch_probs(unmatched_file, known_links_file):
     (str): csv file name for unmatched training data
     (str): csv file name for matched training data
   Output:
-    (tuple): tuple of the form (lst of similarity tuples, lst of 
+    (tuple): tuple of the form (lst of similarity tuples, lst of
     probability tuples)
   '''
   matched = est_prob(known_links_file)
@@ -188,8 +188,8 @@ def classifier(unmatched_file, known_links_file, mu, lambda_):
     (dict): classifier for all possible similarity tuples
   '''
 
-  sim_tups, prob_tuples = get_match_unmatch_probs(unmatched_file,known_links_file) 
-  comb = combination(["low", "medium", "high"]) 
+  sim_tups, prob_tuples = get_match_unmatch_probs(unmatched_file,known_links_file)
+  comb = combination(["low", "medium", "high"])
   rv = {}
 
   # 1) Label tuples with un/matched prob = 0
@@ -229,5 +229,5 @@ def classifier(unmatched_file, known_links_file, mu, lambda_):
     sim, _, _ = tuple
     if sim not in rv:
       rv[sim] = "possible match"
-  
+
   return rv
